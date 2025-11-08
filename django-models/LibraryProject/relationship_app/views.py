@@ -37,9 +37,9 @@ def register_view(request):
         if form.is_valid():
             user = form.save()
             login(request, user)  # Automatically log in the user
-            return redirect('relationship_app:list_books')
+            return redirect('list_books')
     else:
-        form = RegisterForm()
+        form = UserCreationForm()
 
     context = {
         'form': form,
@@ -54,7 +54,7 @@ def login_view(request):
         if form.is_valid():
             user = form.get_user()
             login(request, user)
-            return redirect('relationship_app:list_books')
+            return redirect('list_books')
     else:
         form = AuthenticationForm()
 
