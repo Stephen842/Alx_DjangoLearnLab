@@ -1,6 +1,9 @@
 from django.http import HttpResponse
-from django.shortcuts import render, get_object_or_404
+from django.shortcuts import render, redirect, get_object_or_404
 from django.views.generic.detail import DetailView
+from django.contrib.auth import login, logout, authenticate
+from django.contrib.auth.forms import AuthenticationForm
+from .forms import RegisterForm
 from .models import Library, Book
 
 # Function-based view: simple text list of books (for ALX check)
@@ -25,3 +28,44 @@ class LibraryDetailView(DetailView):
     model = Library
     template_name = 'relationship_app/library_detail.html'
     context_object_name = 'library'
+
+
+# User Registration
+def register_view(request):
+    if request.method == "POST":
+        form = RegisterForm(request.POST)
+        if form.is_valid():
+            user = form.save()
+            login(request, user)  # Automatically log in the user
+            return redirect('relationship_app:list_books')
+    else:
+        form = RegisterForm()
+
+    context = {
+        'form': form,
+    }
+
+    return render(request, 'relationship_app/register.html', context)
+
+# User Login
+def login_view(request):
+    if request.method == "POST":
+        form = AuthenticationForm(request, data=request.POST)
+        if form.is_valid():
+            user = form.get_user()
+            login(request, user)
+            return redirect('relationship_app:list_books')
+    else:
+        form = AuthenticationForm()
+
+    context = {
+        'form': form,
+    }
+
+    return render(request, 'relationship_app/login.html', context)
+
+# User Logout
+def logout_view(request):
+    logout(request)
+    return render(request, 'relationship_app/logout.html')
+
