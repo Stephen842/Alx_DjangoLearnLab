@@ -6,7 +6,7 @@ from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 from django.contrib.auth.decorators import user_passes_test, login_required
 from django.contrib.auth.decorators import permission_required
 from .forms import RegisterForm
-from .models import Library, Book
+from .models import Library, Book, UserProfile
 
 # Function-based view: simple text list of books (for ALX check)
 def list_books(request):
@@ -83,26 +83,34 @@ def logout_view(request):
     logout(request)
     return render(request, 'relationship_app/logout.html')
 
-def is_admin(user):
-    return user.userprofile.role == 'Admin'
-
-@login_required
-@user_passes_test(is_admin)
-def admin_view(request):
+def Admin(user):
+    """
+    Check if user is authenticated and has 'admin' role.
+    Only users with the 'Admin' role can access admin views.
+    """
+    # Check if user is authenticated first
+    if not user.is_authenticated:
+        return False
+    # Safely check if user has a profile and if the role is 'admin'
+    try:
+        return user.profile.role == 'admin'
+    except UserProfile.DoesNotExist:
+        # User doesn't have a profile
+        return False
+@user_passes_test(Admin)
+def admin_dashboard(request):
     return render(request, 'relationship_app/admin_view.html')
 
-def is_librarian(user):
-    return user.userprofile.role == 'Librarian'
 
-@login_required
-@user_passes_test(is_librarian)
-def librarian_view(request):
+def Librarian(user):
+    return hasattr(user, 'profile') and user.profile.role == 'librarian'
+@user_passes_test(Librarian)
+def librarian_dashboard(request):
     return render(request, 'relationship_app/librarian_view.html')
 
-def is_member(user):
-    return user.userprofile.role == 'Member'
 
-@login_required
-@user_passes_test(is_member)
-def member_view(request):
+def Member(user):
+    return hasattr(user, 'profile') and user.profile.role == 'member'
+@user_passes_test(Member)
+def member_dashboard(request):
     return render(request, 'relationship_app/member_view.html')
