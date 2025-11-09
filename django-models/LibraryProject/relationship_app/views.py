@@ -72,13 +72,28 @@ def logout_view(request):
 
 # Helper checks
 def is_admin(user):
-    return hasattr(user, 'userprofile') and user.userprofile.role == 'Admin'
+    return (
+        user.is_authenticated and (
+            (hasattr(user, 'userprofile') and user.userprofile.role == 'Admin') or
+            user.groups.filter(name='Admin').exists()
+        )
+    )
 
 def is_librarian(user):
-    return hasattr(user, 'userprofile') and user.userprofile.role == 'Librarian'
+    return (
+        user.is_authenticated and (
+            (hasattr(user, 'userprofile') and user.userprofile.role == 'Librarian') or
+            user.groups.filter(name='Librarian').exists()
+        )
+    )
 
 def is_member(user):
-    return hasattr(user, 'userprofile') and user.userprofile.role == 'Member'
+    return (
+        user.is_authenticated and (
+            (hasattr(user, 'userprofile') and user.userprofile.role == 'Member') or
+            user.groups.filter(name='Member').exists()
+        )
+    )
 
 
 @login_required
