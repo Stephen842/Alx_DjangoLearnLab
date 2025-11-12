@@ -2,6 +2,7 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import permission_required
 from django.db.models import Q
 from .models import Book
+from .forms import ExampleForm
 
 @permission_required('bookshelf.can_view', raise_exception=True)
 def book_list(request):
@@ -12,12 +13,17 @@ def book_list(request):
 @permission_required('bookshelf.can_create', raise_exception=True)
 def create_book(request):
     if request.method == 'POST':
-        title = request.POST.get('title')
-        author = request.POST.get('author')
-        description = request.POST.get('description')
-        Book.objects.create(title=title, author=author, description=description)
-        return redirect('book_list')
-    return render(request, 'pages/book_form.html')
+        form = ExampleForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect('book_list')
+    else:
+        form = ExampleForm()
+
+    context = {
+        'form': form,
+    }
+    return render(request, 'bookshelf/form_example.html', context)
 
 
 @permission_required('bookshelf.can_edit', raise_exception=True)
