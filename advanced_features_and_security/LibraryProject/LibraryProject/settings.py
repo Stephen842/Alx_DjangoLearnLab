@@ -25,6 +25,20 @@ SECRET_KEY = 'django-insecure-02qvnwkps!%zi8y6db5(5c1r&_ha447p-07bc#oghe8*#@0ij#
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
+# Prevent content sniffing and enforce XSS protection
+SECURE_BROWSER_XSS_FILTER = True
+X_FRAME_OPTIONS = 'DENY'
+SECURE_CONTENT_TYPE_NOSNIFF = True
+
+# Ensure cookies are only sent over HTTPS
+CSRF_COOKIE_SECURE = True
+SESSION_COOKIE_SECURE = True
+
+# Recommended additions for better security
+SECURE_HSTS_SECONDS = 31536000  # Force HTTPS for one year
+SECURE_HSTS_INCLUDE_SUBDOMAINS = True
+SECURE_HSTS_PRELOAD = True
+
 ALLOWED_HOSTS = []
 
 
@@ -39,6 +53,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'bookshelf',
     'relationship_app',
+    'csp'
 ]
 
 MIDDLEWARE = [
@@ -49,7 +64,13 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'csp.middleware.CSPMiddleware',
 ]
+
+CSP_DEFAULT_SRC = ("'self'",)
+CSP_SCRIPT_SRC = ("'self'", 'https://cdn.jsdelivr.net',)
+CSP_STYLE_SRC = ("'self'", 'https://fonts.googleapis.com',)
+CSP_FONT_SRC = ("'self'", 'https://fonts.gstatic.com',)
 
 ROOT_URLCONF = 'LibraryProject.urls'
 
