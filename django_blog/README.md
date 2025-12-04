@@ -95,45 +95,37 @@ This section of the Django blog project implements **full CRUD functionality** f
 - Pagination is automatically applied if there are many posts.
 
 
-## Comment Functionality
+## Adding Comment Functionality to Blog Posts
 
-This feature adds a commenting system directly to the **post detail page**, allowing users to engage with blog posts without navigating to separate pages.
+### Objective
+Enhance user interaction by allowing authenticated users to post, edit, and delete comments on blog posts.
 
 ### Features
+- Users can view all comments under a blog post.
+- Authenticated users can:
+  - Add a new comment directly on the post detail page.
+  - Edit or delete their own comments.
+- Only comment authors have permission to edit or delete their comments.
+- Comments are displayed in chronological order under the post content.
 
-- **View Comments**  
-  All comments for a post are displayed below the post content, showing the author and timestamp.
+### Implementation
+- **Model**: `Comment` with fields:
+  - `post`: ForeignKey to `Post`
+  - `author`: ForeignKey to `User`
+  - `content`: TextField
+  - `created_at` & `updated_at`: DateTimeFields
 
-- **Add Comment**  
-  Authenticated users can add a new comment via a form embedded on the post detail page.
+- **Forms**: `CommentForm` (ModelForm) handles comment creation and updates.
 
-- **Edit / Delete Comment**  
-  Users can edit or delete only their own comments directly on the post detail page.
+- **Views**: Class-based views:
+  - `CommentCreateView`: Creates a comment for a specific post.
+  - `CommentUpdateView`: Allows authors to edit their comments.
+  - `CommentDeleteView`: Allows authors to delete their comments.
 
-### Implementation Details
+- **Templates**: Comments are integrated into the `post_detail.html` page. Inline forms are used for editing and deleting comments.
 
-- **Model**  
-  `Comment` model with:
-  - `post` (ForeignKey to `Post`)
-  - `author` (ForeignKey to `User`)
-  - `content` (TextField)
-  - `created_at` & `updated_at` timestamps
-
-- **Form**  
-  `CommentForm` is a `ModelForm` used to create and update comments inline.
-
-- **Views**  
-  Handled within the `PostDetailView` to display existing comments and process new submissions. Permissions ensure only comment authors can edit or delete their comments.
-
-- **Templates**  
-  Comments are rendered on the post detail page with TailwindCSS for clean styling. The form and comment list are fully integrated with the post content.
-
-- **URLs**  
-  Comment actions use intuitive, embedded URLs, e.g., `/posts/<post_id>/` handles displaying and posting comments, while edit/delete links are shown conditionally for comment authors.
-
-### Usage
-
-1. Open a post detail page.  
-2. Scroll to the comments section to view all comments.  
-3. Authenticated users can add a new comment using the embedded form.  
-4. Users can edit or delete their own comments via links displayed next to their comment.
+- **URLs**:
+  ```text
+  post/<int:post_id>/comments/new/   # Create comment
+  comment/<int:pk>/update/           # Update comment
+  comment/<int:pk>/delete/           # Delete comment
