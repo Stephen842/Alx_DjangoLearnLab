@@ -3,7 +3,11 @@ from django.contrib.auth import login, logout, authenticate
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.contrib.auth.forms import AuthenticationForm
-from .forms import UserRegisterForm
+from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView
+from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
+from django.urls import reverse_lazy
+from .models import Post
+from .forms import UserRegisterForm, PostForm
 
 
 # Registration View
@@ -43,7 +47,7 @@ def login_view(request):
     
     context = {
         'form': form,
-        'title': '',
+        'title': 'Django Blog - Login Now',
     }
     return render(request, 'blog/login.html', context)
 
@@ -53,13 +57,6 @@ def logout_view(request):
     messages.info(request, 'You have successfully logged out.')
     return redirect('home')
 
-# Landing page view
-def home(request):
-    context = {
-        'title': '',
-    }
-    return render(request, 'blog/home.html', context)
-
 # Profile view
 @login_required
 def profile_view(request):
@@ -67,4 +64,53 @@ def profile_view(request):
         request.user.email = request.POST.get('email', request.user.email)
         request.user.save()
         messages.success(request, 'Profile updated successfully!')
-    return render(request, 'blog/profile.html')
+
+    context = {
+        'title': 'Django Blog - User Profile',
+    }
+    return render(request, 'blog/profile.html', context)
+
+
+# Landing page view
+class PostListView(ListView):
+    model = Post
+    template_name = 'blog/post_list.html'
+    context_object_name = 'posts'
+    ordering = ['-published_date']
+    paginate_by = 12
+
+
+class PostDetailView(DetailView):
+    model = Post
+    template_name = 'blog/post_detail.html'
+
+
+class PostCreateView(LoginRequiredMixin, CreateView):
+    model = Post
+    form_class = PostForm
+    template_name = 'blog/post_form.html' # used for both create & update
+
+    def form_valid(self, form):
+        form.instance.author = self.request.user
+        return super().form_valid(form)
+    
+
+class PostUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
+    model = Post
+    form_class = PostForm
+    template_name = 'blog/post_form.html' # used for both create & update
+
+    def test_func(self):
+        post = self.get_object()
+        return post.author == self.request.user
+    
+
+class PostDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
+    model = Post
+    form_class = PostForm
+    template_name = 'blog/post_confirm_delete.html'
+    success_url = reverse_lazy('home')
+
+    def test_func(self):
+        post = self.get_object()
+        return post.author == self.request.user
