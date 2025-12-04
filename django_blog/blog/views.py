@@ -1,4 +1,5 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
+from django.http import HttpResponseForbidden
 from django.contrib.auth import login, logout, authenticate
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
@@ -6,8 +7,8 @@ from django.contrib.auth.forms import AuthenticationForm
 from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.urls import reverse_lazy
-from .models import Post
-from .forms import UserRegisterForm, PostForm
+from .models import Post, Comment
+from .forms import UserRegisterForm, PostForm, CommentForm
 
 
 # Registration View
@@ -84,6 +85,26 @@ class PostDetailView(DetailView):
     model = Post
     template_name = 'blog/post_detail.html'
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['comment_form'] = CommentForm()
+        context['comments'] = self.object.comments.order_by('-created_at')
+        return context
+    
+    def post(self, request, *args, **kwargs):
+        self.object = self.get_object()
+        form = CommentForm(request.POST)
+
+        if form.is_valid() and request.user.is_authenticated:
+            comment = form.save(commit=False)
+            comment.post = self.object
+            comment.author = request.user
+            comment.save()
+            return redirect('post-detail', pk=self.object.pk)
+        
+        context = self.get_context_data(comment_form=form)
+        return self.render_to_response(context)
+
 
 class PostCreateView(LoginRequiredMixin, CreateView):
     model = Post
@@ -114,3 +135,32 @@ class PostDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
     def test_func(self):
         post = self.get_object()
         return post.author == self.request.user
+    
+
+# Edit Comment
+@login_required
+def edit_comment(request, pk):
+    comment = get_object_or_404(Comment, pk=pk)
+
+    if request.user != comment.author:
+        return HttpResponseForbidden()
+    
+    if request.method == 'POST':
+        form = CommentForm(request.POST, instance=comment)
+        if form.is_valid():
+            form.save()
+            return redirect('post-detail', pk=comment.post.id)
+        
+    return redirect('post-detail', pk=comment.post.id)
+
+
+# Delete Comment
+@login_required
+def delete_comment(request, pk):
+    comment = get_object_or_404(Comment, pk=pk)
+    if request.user != comment.author:
+        return HttpResponseForbidden()
+    
+    post_id = comment.post.id
+    comment.delete()
+    return redirect('post-detail', pk=post_id)

@@ -93,3 +93,47 @@ This section of the Django blog project implements **full CRUD functionality** f
 - Click a post title to view its details.
 - Edit or delete your own posts via the links on the post detail or list pages.
 - Pagination is automatically applied if there are many posts.
+
+
+## Comment Functionality
+
+This feature adds a commenting system directly to the **post detail page**, allowing users to engage with blog posts without navigating to separate pages.
+
+### Features
+
+- **View Comments**  
+  All comments for a post are displayed below the post content, showing the author and timestamp.
+
+- **Add Comment**  
+  Authenticated users can add a new comment via a form embedded on the post detail page.
+
+- **Edit / Delete Comment**  
+  Users can edit or delete only their own comments directly on the post detail page.
+
+### Implementation Details
+
+- **Model**  
+  `Comment` model with:
+  - `post` (ForeignKey to `Post`)
+  - `author` (ForeignKey to `User`)
+  - `content` (TextField)
+  - `created_at` & `updated_at` timestamps
+
+- **Form**  
+  `CommentForm` is a `ModelForm` used to create and update comments inline.
+
+- **Views**  
+  Handled within the `PostDetailView` to display existing comments and process new submissions. Permissions ensure only comment authors can edit or delete their comments.
+
+- **Templates**  
+  Comments are rendered on the post detail page with TailwindCSS for clean styling. The form and comment list are fully integrated with the post content.
+
+- **URLs**  
+  Comment actions use intuitive, embedded URLs, e.g., `/posts/<post_id>/` handles displaying and posting comments, while edit/delete links are shown conditionally for comment authors.
+
+### Usage
+
+1. Open a post detail page.  
+2. Scroll to the comments section to view all comments.  
+3. Authenticated users can add a new comment using the embedded form.  
+4. Users can edit or delete their own comments via links displayed next to their comment.
