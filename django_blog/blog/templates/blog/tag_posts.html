@@ -1,18 +1,20 @@
 {% extends "blog/base.html" %}
-{% block title %}All Posts{% endblock %}
+{% block title %}Posts tagged "{{ tag_name }}"{% endblock %}
 
 {% block content %}
 <div class="max-w-3xl mx-auto">
 
-  <!-- Header + New Post Button -->
+  <!-- Header -->
   <div class="flex items-center justify-between mb-6">
-    <h1 class="text-2xl font-semibold">Latest Posts</h1>
+    <h1 class="text-2xl font-semibold">Posts tagged "{{ tag_name }}"</h1>
   </div>
 
   <!-- Search Bar -->
   <form method="GET" action="{% url 'search-posts' %}" class="mb-6 flex gap-2">
-    <input type="text" name="q" value="{{ query }}" placeholder="Search posts..."  class="flex-1 px-3 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500">
-    <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition"> Search </button>
+    <input type="text" name="q" value="{{ query }}" placeholder="Search posts..." class="flex-1 px-3 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500">
+    <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition">
+      Search
+    </button>
   </form>
 
   <!-- Post List -->
@@ -55,7 +57,7 @@
         </div>
       </article>
     {% empty %}
-      <p class="text-gray-600">No posts yet.</p>
+      <p class="text-gray-600">No posts found for tag "<span class="font-medium">{{ tag_name }}</span>".</p>
     {% endfor %}
   </div>
 

@@ -129,3 +129,21 @@ Enhance user interaction by allowing authenticated users to post, edit, and dele
   post/<int:post_id>/comments/new/   # Create comment
   comment/<int:pk>/update/           # Update comment
   comment/<int:pk>/delete/           # Delete comment
+
+# Tagging & Search
+
+## Overview
+Enhances the Django blog project by adding **tagging** and **search functionality**. Users can categorize posts via tags and search posts by keywords or tags.
+
+---
+
+## Features
+
+- **Tagging**
+  - Add multiple tags to posts using [django-taggit](https://django-taggit.readthedocs.io/).
+  - Tags are clickable to view related posts.
+  
+- **Search**
+  - Search posts by title, content, or tags.
+  - Search results use the same layout as the main post list.
+---

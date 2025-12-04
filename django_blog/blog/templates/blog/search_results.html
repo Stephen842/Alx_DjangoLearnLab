@@ -1,28 +1,31 @@
 {% extends "blog/base.html" %}
-{% block title %}All Posts{% endblock %}
+{% block title %}Search Results{% endblock %}
 
 {% block content %}
 <div class="max-w-3xl mx-auto">
 
-  <!-- Header + New Post Button -->
+  <!-- Header -->
   <div class="flex items-center justify-between mb-6">
-    <h1 class="text-2xl font-semibold">Latest Posts</h1>
+    <h1 class="text-2xl font-semibold">Search Results</h1>
   </div>
 
   <!-- Search Bar -->
   <form method="GET" action="{% url 'search-posts' %}" class="mb-6 flex gap-2">
-    <input type="text" name="q" value="{{ query }}" placeholder="Search posts..."  class="flex-1 px-3 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500">
+    <input type="text" name="q" value="{{ query }}" placeholder="Search posts..." class="flex-1 px-3 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500">
     <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition"> Search </button>
   </form>
 
+  <!-- Search Query Info -->
+  {% if query %}
+    <p class="mb-4 text-gray-600">Showing results for "<span class="font-medium">{{ query }}</span>"</p>
+  {% endif %}
+
   <!-- Post List -->
   <div class="space-y-6">
-    {% for post in posts %}
+    {% for post in results %}
       <article class="bg-white p-5 rounded-lg shadow-sm">
         <h2 class="text-xl font-semibold mb-2">
-          <a href="{% url 'post-detail' post.pk %}" class="hover:text-blue-600">
-            {{ post.title }}
-          </a>
+          <a href="{% url 'post-detail' post.pk %}" class="hover:text-blue-600">{{ post.title }}</a>
         </h2>
 
         <p class="text-sm text-gray-500 mb-3">
@@ -55,7 +58,7 @@
         </div>
       </article>
     {% empty %}
-      <p class="text-gray-600">No posts yet.</p>
+      <p class="text-gray-600">No results found for "<span class="font-medium">{{ query }}</span>".</p>
     {% endfor %}
   </div>
 
@@ -64,11 +67,11 @@
     {% if is_paginated %}
       <div class="flex justify-center gap-3">
         {% if page_obj.has_previous %}
-          <a href="?page={{ page_obj.previous_page_number }}" class="px-3 py-1 border rounded">Prev</a>
+          <a href="?q={{ query }}&page={{ page_obj.previous_page_number }}" class="px-3 py-1 border rounded">Prev</a>
         {% endif %}
         <span class="px-3 py-1">{{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</span>
         {% if page_obj.has_next %}
-          <a href="?page={{ page_obj.next_page_number }}" class="px-3 py-1 border rounded">Next</a>
+          <a href="?q={{ query }}&page={{ page_obj.next_page_number }}" class="px-3 py-1 border rounded">Next</a>
         {% endif %}
       </div>
     {% endif %}
