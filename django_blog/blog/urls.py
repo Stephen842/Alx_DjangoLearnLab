@@ -1,6 +1,6 @@
 from django.urls import path
 from . import views
-from .views import PostListView, PostDetailView, PostCreateView, PostUpdateView, PostDeleteView
+from .views import PostListView, PostDetailView, PostCreateView, PostUpdateView, PostDeleteView, CommentCreateView, CommentUpdateView, CommentDeleteView
 
 urlpatterns = [
     path('', PostListView.as_view(), name='home'),
@@ -18,6 +18,7 @@ urlpatterns = [
     path('post/<int:pk>/delete/', PostDeleteView.as_view(), name='post-delete'),
 
     ### Blog Comment routing
-    path("comment/<int:pk>/delete/", views.delete_comment, name="comment-delete"),
-    path("comment/<int:pk>/edit/", views.edit_comment, name="comment-edit"),
+    path('posts/<int:post_id>/comments/new/', CommentCreateView.as_view(), name='comment-create'),
+    path('comments/<int:pk>/edit/', CommentUpdateView.as_view(), name='comment-update'),
+    path('comments/<int:pk>/delete/', CommentDeleteView.as_view(), name='comment-delete'),
 ]

@@ -1,0 +1,33 @@
+{% extends "blog/base.html" %}
+{% load widget_tweaks %}
+
+{% block title %}Add Comment{% endblock %}
+
+{% block content %}
+<div class="max-w-2xl mx-auto bg-white p-8 rounded-lg shadow-lg mt-10">
+    <h2 class="text-2xl font-semibold mb-6 text-gray-800">Add a Comment</h2>
+
+    <form method="POST" class="space-y-4">
+        {% csrf_token %}
+
+        <!-- Display non-field errors -->
+        {{ form.non_field_errors }}
+        
+        <!-- Content Field -->
+        <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">{{ form.content.label }}</label>
+            {{ form.content|add_class:"w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500" }}
+            {% if form.content.errors %}
+                <p class="text-red-500 text-sm mt-1">{{ form.content.errors.0 }}</p>
+            {% endif %}
+        </div>
+
+        <!-- Submit Button -->
+        <div>
+            <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white py-2.5 rounded-lg font-medium transition">
+                Post Comment
+            </button>
+        </div>
+    </form>
+</div>
+{% endblock %}
