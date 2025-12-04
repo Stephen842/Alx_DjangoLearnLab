@@ -1,0 +1,67 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+        <title>{% block title %} {{ title }} {% endblock %}</title>
+
+        <!-- Google Fonts -->
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+        <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet" />
+
+        <!-- Tailwind CDN -->
+        <script src="https://cdn.tailwindcss.com"></script>
+
+        <!-- Tailwind Config -->
+        <script>
+            tailwind.config = {
+                theme: {
+                    extend: {
+                        fontFamily: {
+                            sans: ['Inter', 'sans-serif'],
+                        },
+                    },
+                },
+            }
+        </script>
+    </head>
+
+    <body class="bg-gray-50 text-gray-800 flex flex-col min-h-screen">
+
+        <!-- NAVBAR -->
+        <header class="bg-white shadow-sm">
+            <nav class="flex items-center justify-between py-4 px-4">
+                <a href="{% url 'home' %}" class="text-xl font-semibold text-gray-900 hover:text-blue-600 transition"> DjangoBlog </a>
+
+                <div class="flex items-center gap-6 text-gray-700 font-medium">
+                    {% if user.is_authenticated %}
+                        <a href="{% url 'home' %}" class="hover:text-blue-600 transition"> Home </a>
+                        <a href="{% url 'profile' %}" class="hover:text-blue-600 transition"> Profile </a>
+                        <a href="{% url 'logout' %}" class="hover:text-red-500 transition"> Logout </a>
+                    {% else %}
+                        <a href="{% url 'home' %}" class="hover:text-blue-600 transition"> Home </a>
+                        <a href="{% url 'login' %}" class="hover:text-blue-600 transition"> Login </a>
+                        <a href="{% url 'register' %}" class="hover:text-blue-600 transition"> Register</a>
+                    {% endif %}
+                </div>
+            </nav>
+        </header>
+
+        <!-- MAIN CONTENT -->
+        <main class="flex-grow max-w-5xl mx-auto w-full px-4 py-10">
+            {% block content %}
+            {% endblock %}
+        </main>
+
+        <!-- FOOTER (STICKY AT BOTTOM) -->
+        <footer class="bg-gray-900 text-gray-300 py-4 mt-auto">
+            <div class="max-w-5xl mx-auto text-center text-sm">
+                &copy; {% now 'Y' %} Django Blog — All Rights Reserved.
+            </div>
+        </footer>
+    </body>
+</html>
