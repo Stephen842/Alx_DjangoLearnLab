@@ -18,7 +18,7 @@ class PostForm(forms.ModelForm):
         model = Post
         fields = ['title', 'content', 'tags']
         widgets = {
-            'tags': TagWidget(attrs={'class': 'w-full px-3 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500'}),
+            'tags': TagWidget(),
         }
 
 
