@@ -175,9 +175,14 @@ def search_posts(request):
     return render(request, 'blog/search_results.html', context)
 
 
-class TagPostListView(ListView):
+class PostByTagListView(ListView):
     template_name = 'blog/tag_posts.html'
     context_object_name = 'posts'
 
     def get_queryset(self):
-        return Post.objects.filter(tags__name=self.kwargs['tag_name'])
+        return Post.objects.filter(tags__slug=self.kwargs['tag_slug'])
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["tag_name"] = self.kwargs["tag_name"]   # pass tag to template
+        return context
