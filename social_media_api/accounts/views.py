@@ -3,6 +3,7 @@ from rest_framework.authtoken.models import Token
 from django.contrib.auth import authenticate
 from rest_framework.response import Response
 from django.contrib.auth import get_user_model
+from django.shortcuts import get_object_or_404
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.views import APIView
 
@@ -53,3 +54,21 @@ class ProfileView(generics.RetrieveUpdateAPIView):
 
     def get_object(self):
         return self.request.user
+
+
+class FollowUserView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request, user_id):
+        target = get_object_or_404(User, id=user_id)
+        request.user.following.add(target)
+        return Response({"detail": "User followed"})
+
+
+class UnfollowUserView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request, user_id):
+        target = get_object_or_404(User, id=user_id)
+        request.user.following.remove(target)
+        return Response({"detail": "User unfollowed"})
