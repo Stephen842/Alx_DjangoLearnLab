@@ -1,4 +1,4 @@
-from rest_framework import generics, status, viewsets
+from rest_framework import generics, status, viewsets, permissions
 from rest_framework.authtoken.models import Token
 from django.contrib.auth import authenticate
 from rest_framework.response import Response
@@ -7,6 +7,7 @@ from django.shortcuts import get_object_or_404
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.views import APIView
 
+from .models import CustomUser
 from .serializers import RegisterSerializer, LoginSerializer, UserProfileSerializer
 
 User = get_user_model()
@@ -32,7 +33,7 @@ class LoginView(APIView):
 
         if not user:
             return Response(
-                {"detail": "Invalid credentials"},
+                {'detail': 'Invalid credentials'},
                 status=status.HTTP_401_UNAUTHORIZED
             )
 
@@ -40,9 +41,9 @@ class LoginView(APIView):
 
         return Response(
             {
-                "token": token.key,
-                "user_id": user.id,
-                "username": user.username,
+                'token': token.key,
+                'user_id': user.id,
+                'username': user.username,
             },
             status=status.HTTP_200_OK
         )
@@ -56,19 +57,27 @@ class ProfileView(generics.RetrieveUpdateAPIView):
         return self.request.user
 
 
-class FollowUserView(APIView):
-    permission_classes = [IsAuthenticated]
+class FollowUserView(generics.GenericAPIView):
+    permission_classes = [permissions.IsAuthenticated]
+    queryset = CustomUser.objects.all()
 
     def post(self, request, user_id):
-        target = get_object_or_404(User, id=user_id)
-        request.user.following.add(target)
-        return Response({"detail": "User followed"})
+        user_to_follow = self.get_queryset().get(id=user_id)
+        request.user.following.add(user_to_follow)
+        return Response(
+            {'detail': 'User followed successfully'},
+            status=status.HTTP_200_OK
+        )
 
 
-class UnfollowUserView(APIView):
-    permission_classes = [IsAuthenticated]
+class UnfollowUserView(generics.GenericAPIView):
+    permission_classes = [permissions.IsAuthenticated]
+    queryset = CustomUser.objects.all()
 
     def post(self, request, user_id):
-        target = get_object_or_404(User, id=user_id)
-        request.user.following.remove(target)
-        return Response({"detail": "User unfollowed"})
+        user_to_unfollow = self.get_queryset().get(id=user_id)
+        request.user.following.remove(user_to_unfollow)
+        return Response(
+            {'detail': 'User unfollowed successfully'},
+            status=status.HTTP_200_OK
+        )
