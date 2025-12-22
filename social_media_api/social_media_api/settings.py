@@ -23,9 +23,28 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-$b=rhj3tc^g@*7v9v93ll+v)e=$^@kxh+#vf%d$di(dev!d_q4'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
-ALLOWED_HOSTS = []
+# Redirect all HTTP requests to HTTPS
+SECURE_SSL_REDIRECT = True
+
+# Prevent content sniffing and enforce XSS protection
+SECURE_BROWSER_XSS_FILTER = True # Enable browser XSS filter
+X_FRAME_OPTIONS = 'DENY' # Prevent clickjacking
+SECURE_CONTENT_TYPE_NOSNIFF = True # Prevent MIME-type sniffing
+
+# Ensure cookies are only sent over HTTPS
+CSRF_COOKIE_SECURE = True
+SESSION_COOKIE_SECURE = True
+
+# Recommended additions for better security
+SECURE_HSTS_SECONDS = 31536000  # Force HTTPS for one year
+SECURE_HSTS_INCLUDE_SUBDOMAINS = True
+SECURE_HSTS_PRELOAD = True
+
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+
+ALLOWED_HOSTS = ['*']
 
 
 # Application definition
@@ -55,7 +74,28 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'csp.middleware.CSPMiddleware',
 ]
+
+CSP_DEFAULT_SRC = ("'self'",)
+
+CSP_STYLE_SRC = (
+    "'self'",
+    "https://fonts.googleapis.com",
+    "https://cdn.jsdelivr.net",
+    "https://unpkg.com",
+)
+
+CSP_FONT_SRC = (
+    "'self'",
+    "https://fonts.gstatic.com",
+)
+
+CSP_SCRIPT_SRC = (
+    "'self'",
+    "https://cdn.jsdelivr.net",
+)
+
 
 AUTH_USER_MODEL = 'accounts.CustomUser'
 
